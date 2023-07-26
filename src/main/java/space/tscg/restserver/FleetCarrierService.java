@@ -1,8 +1,6 @@
 package space.tscg.restserver;
 
-import java.nio.charset.Charset;
 import java.util.List;
-import java.util.UUID;
 
 import com.rethinkdb.net.Result;
 
@@ -11,9 +9,11 @@ import panda.std.Blank;
 import space.tscg.ServerLogger;
 import space.tscg.common.util.TypePair;
 import space.tscg.database.CarriersDatabase;
-import space.tscg.database.FleetCarrier;
+import space.tscg.database.entity.FleetCarrier;
 import space.tscg.operation.Transformer;
 import space.tscg.operation.UpdatedOperation;
+import space.tscg.restserver.http.FleetCarrierError;
+import space.tscg.restserver.http.HttpResponse;
 
 public class FleetCarrierService {
     ServerLogger logger;
@@ -38,14 +38,10 @@ public class FleetCarrierService {
         return HttpResponse.created("Fleet Carrier Registered", fco.getId());
     }
 
-    public HttpResponse<FleetCarrier> get(String callsign, String name) {
-        return get(this.getUUIDFromString(callsign + name).toString());
-    }
-
-    public HttpResponse<FleetCarrier> get(String uuid) {
-        var FleetCarrier = database.getCarrierObject(uuid);
+    public HttpResponse<FleetCarrier> get(String id) {
+        var FleetCarrier = database.getCarrierObject(id);
         if (FleetCarrier.isEmpty())
-            return HttpResponse.notFound(FleetCarrierError.NOT_FOUND, uuid);
+            return HttpResponse.notFound(FleetCarrierError.NOT_FOUND, id);
         return HttpResponse.ok(FleetCarrier.get());
     }
 
@@ -68,16 +64,12 @@ public class FleetCarrierService {
         return HttpResponse.notFound(FleetCarrierError.NOT_FOUND, fcr.getUUID().toString());
     }
 
-    public HttpResponse<Blank> delete(String callsign, String carrierId) {
-        return delete(this.getUUIDFromString(callsign + carrierId).toString());
-    }
-
-    public HttpResponse<Blank> delete(String uuid) {
-        var operation = database.delete(uuid);
+    public HttpResponse<Blank> delete(String id) {
+        var operation = database.delete(id);
         if (operation.getDeleted() > 0) {
-            return HttpResponse.accepted(uuid);
+            return HttpResponse.accepted(id);
         }
-        return HttpResponse.notFound(FleetCarrierError.NOT_FOUND, uuid);
+        return HttpResponse.notFound(FleetCarrierError.NOT_FOUND, id);
     }
 
     public HttpResponse<List<FleetCarrier>> getAll() {
@@ -86,9 +78,5 @@ public class FleetCarrierService {
             return HttpResponse.ok(result.stream().toList());
         }
         return HttpResponse.internalServerError(FleetCarrierError.DATABASE_ERROR);
-    }
-
-    private UUID getUUIDFromString(String namespace) {
-        return UUID.nameUUIDFromBytes(namespace.getBytes(Charset.forName("UTF-8")));
     }
 }

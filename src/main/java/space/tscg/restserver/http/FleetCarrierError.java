@@ -1,4 +1,4 @@
-package space.tscg.restserver;
+package space.tscg.restserver.http;
 
 public enum FleetCarrierError
 {

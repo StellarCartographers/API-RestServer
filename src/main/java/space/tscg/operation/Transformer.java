@@ -3,19 +3,19 @@ package space.tscg.operation;
 import elite.dangerous.capi.FleetCarrierData;
 import elite.dangerous.capi.meta.Finance.ServiceTaxation;
 import elite.dangerous.capi.meta.ServicesCrew;
-import space.tscg.database.FleetCarrier;
-import space.tscg.database.Services;
-import space.tscg.database.Services.Armoury;
-import space.tscg.database.Services.ConcourseBar;
-import space.tscg.database.Services.Outfitting;
-import space.tscg.database.Services.PioneerSupplies;
-import space.tscg.database.Services.RedemptionOffice;
-import space.tscg.database.Services.Refuel;
-import space.tscg.database.Services.Repair;
-import space.tscg.database.Services.SecureWarehouse;
-import space.tscg.database.Services.Shipyard;
-import space.tscg.database.Services.UniversalCartographics;
-import space.tscg.database.Services.VistaGenomics;
+import space.tscg.database.entity.FleetCarrier;
+import space.tscg.database.entity.Services;
+import space.tscg.database.entity.Services.Armoury;
+import space.tscg.database.entity.Services.ConcourseBar;
+import space.tscg.database.entity.Services.Outfitting;
+import space.tscg.database.entity.Services.PioneerSupplies;
+import space.tscg.database.entity.Services.RedemptionOffice;
+import space.tscg.database.entity.Services.Refuel;
+import space.tscg.database.entity.Services.Repair;
+import space.tscg.database.entity.Services.SecureWarehouse;
+import space.tscg.database.entity.Services.Shipyard;
+import space.tscg.database.entity.Services.UniversalCartographics;
+import space.tscg.database.entity.Services.VistaGenomics;
 
 public class Transformer {
     /**
@@ -29,7 +29,6 @@ public class Transformer {
         ServiceTaxation taxation = data.getFinance().getServiceTaxation();
         return fc
             .toBuilder()
-                .carrierId(data.getMarket().getId())
                 .callsign(data.getName().getCallsign())
                 .vanityName(data.getName().getVanityName())
                 .currentStarSystem(data.getCurrentStarSystem())

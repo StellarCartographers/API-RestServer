@@ -1,4 +1,4 @@
-package space.tscg.database;
+package space.tscg.database.entity;
 
 import lombok.Builder;
 import lombok.Data;

@@ -1,4 +1,4 @@
-package space.tscg.restserver;
+package space.tscg.restserver.http;
 
 import static io.javalin.http.HttpStatus.*;
 import static panda.std.Blank.*;
@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import io.javalin.http.HttpStatus;
+import io.javalin.openapi.OpenApiIgnore;
 import panda.std.Blank;
 
 public record HttpResponse<T>(HttpStatus status, String customMessage, T type, Object... extras)
@@ -83,16 +84,6 @@ public record HttpResponse<T>(HttpStatus status, String customMessage, T type, O
     }
 
     private static List<HttpStatus> ERRS = new ArrayList<>();
-    private static List<String> extraList = new ArrayList<>();
-
-    public List<String> extraList()
-    {
-        for(Object obj : extras())
-        {
-            extraList.add(obj.toString());
-        }
-        return extraList;
-    }
 
     static
     {

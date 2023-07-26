@@ -14,7 +14,7 @@
 // * You should have received a copy of the GNU General Public License
 // * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 // */
-package space.tscg.database;
+package space.tscg.database.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -36,11 +36,9 @@ import space.tscg.operation.Transformer;
 @Jacksonized
 public class FleetCarrier implements ManagedObject, Diffable<FleetCarrier> {
     
-    static final String TABLE_NAME = "registered";
+    public static final String TABLE_NAME = "registered";
     
     private final String id;
-    
-    private String carrierId;
 
     private String callsign;
 
@@ -61,8 +59,7 @@ public class FleetCarrier implements ManagedObject, Diffable<FleetCarrier> {
     @JsonIgnore
     public static FleetCarrier create(FleetCarrierData data)
     {
-        System.out.println("CREATE = " + data.getUUID().toString());
-        return Transformer.transform(new FleetCarrier(data.getUUID().toString()), data);
+        return Transformer.transform(new FleetCarrier(data.getCarrierId()), data);
     }
     
     /**

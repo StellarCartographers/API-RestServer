@@ -8,6 +8,7 @@ import com.rethinkdb.net.Result;
 
 import space.tscg.common.database.Database;
 import space.tscg.common.database.Operation;
+import space.tscg.database.entity.FleetCarrier;
 
 public class CarriersDatabase extends Database
 {
