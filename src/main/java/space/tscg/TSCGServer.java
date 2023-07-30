@@ -104,7 +104,6 @@ public class TSCGServer
             }))));
 
             var swaggerConfiguration = new SwaggerConfiguration();
-            swaggerConfiguration.setUiPath("/docs/swagger");
             config.plugins.register(new SwaggerPlugin(swaggerConfiguration));
             new JsonSchemaLoader().loadGeneratedSchemes();
         });
