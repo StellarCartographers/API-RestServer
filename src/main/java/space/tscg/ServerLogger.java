@@ -20,14 +20,29 @@ public class ServerLogger
         });
     }
 
+    public static class AuthService
+    {
+        private static Logger authLogger = LoggerFactory.getLogger("FC-API/Auth");
+        
+        public static void log(String format)
+        {
+            authLogger.info(format);
+        }
+        
+        public static void log(String format, Object... args)
+        {
+            authLogger.info(format, args);
+        }
+    }
+
     private static class Before
     {
 
-        private static Logger requestLogger = LoggerFactory.getLogger("FC-API/Req/Info");
+        private static Logger requestLogger = LoggerFactory.getLogger("FC-API/Req");
 
         private static void logIncomingRequest(Context ctx)
         {
-            requestLogger.info("IpAddr: %s | Path: %s | Method: %s".formatted(ctx.ip(), ctx.path(), ctx.method().name()));
+            requestLogger.info("IpAddr: %s | Path: %s | Method: %s".formatted(ctx.host(), ctx.path(), ctx.method().name()));
         }
     }
 }

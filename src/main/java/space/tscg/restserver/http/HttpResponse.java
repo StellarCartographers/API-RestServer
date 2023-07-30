@@ -1,14 +1,21 @@
 package space.tscg.restserver.http;
 
-import static io.javalin.http.HttpStatus.*;
-import static panda.std.Blank.*;
+import static io.javalin.http.HttpStatus.ACCEPTED;
+import static io.javalin.http.HttpStatus.BAD_REQUEST;
+import static io.javalin.http.HttpStatus.CONFLICT;
+import static io.javalin.http.HttpStatus.CREATED;
+import static io.javalin.http.HttpStatus.FORBIDDEN;
+import static io.javalin.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import static io.javalin.http.HttpStatus.NOT_FOUND;
+import static io.javalin.http.HttpStatus.OK;
+import static io.javalin.http.HttpStatus.UNAUTHORIZED;
+import static panda.std.Blank.BLANK;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import io.javalin.http.HttpStatus;
-import io.javalin.openapi.OpenApiIgnore;
 import panda.std.Blank;
 
 public record HttpResponse<T>(HttpStatus status, String customMessage, T type, Object... extras)
