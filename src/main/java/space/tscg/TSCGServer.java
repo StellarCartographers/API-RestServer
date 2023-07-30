@@ -82,7 +82,6 @@ public class TSCGServer
                 contact.setEmail(Dotenv.retrieve("API_CONTACT_EMAIL", "webadmin@tscg.space"));
 
                 OpenApiLicense license = new OpenApiLicense();
-                license.setIdentifier(Dotenv.retrieve("API_LICENSE_ID", "AGPL-3.0-or-later"));
                 license.setName(Dotenv.retrieve("API_LICENSE_NAME", "GNU Affero General Public License v3.0"));
                 license.setUrl(Dotenv.retrieve("API_LICENSE_URL", "https://github.com/StellarCartographers/API-RestServer/blob/master/LICENSE"));
 
