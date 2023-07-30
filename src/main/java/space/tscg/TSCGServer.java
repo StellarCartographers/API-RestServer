@@ -29,8 +29,6 @@ public class TSCGServer
 
     public TSCGServer()
     {
-        System.out.println(Dotenv.retrieve("USER"));
-        
         this.serverLogger = new ServerLogger();
         this.javalin = this.createJavalin();
         this.addFleetCarrierEndpoints();
@@ -106,7 +104,6 @@ public class TSCGServer
             }))));
 
             var swaggerConfiguration = new SwaggerConfiguration();
-            swaggerConfiguration.setUiPath("/api/swagger");
             config.plugins.register(new SwaggerPlugin(swaggerConfiguration));
             new JsonSchemaLoader().loadGeneratedSchemes();
         });
