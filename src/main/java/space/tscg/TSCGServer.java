@@ -29,6 +29,8 @@ public class TSCGServer
 
     public TSCGServer()
     {
+        System.out.println(Dotenv.retrieve("USER"));
+        
         this.serverLogger = new ServerLogger();
         this.javalin = this.createJavalin();
         this.addFleetCarrierEndpoints();
