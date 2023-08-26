@@ -2,7 +2,7 @@ package space.tscg.operation;
 
 import lombok.AllArgsConstructor;
 import lombok.Value;
-import space.tscg.common.util.UpdatedValues;
+import space.tscg.common.UpdatedValues;
 
 @AllArgsConstructor
 @Value

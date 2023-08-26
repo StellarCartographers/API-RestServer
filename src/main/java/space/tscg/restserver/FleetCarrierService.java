@@ -7,7 +7,7 @@ import com.rethinkdb.net.Result;
 import elite.dangerous.capi.FleetCarrierData;
 import panda.std.Blank;
 import space.tscg.ServerLogger;
-import space.tscg.common.util.TypePair;
+import space.tscg.common.TypePair;
 import space.tscg.database.CarriersDatabase;
 import space.tscg.database.entity.FleetCarrier;
 import space.tscg.operation.Transformer;
@@ -31,7 +31,7 @@ public class FleetCarrierService {
         System.out.println(operation);
         if (operation.getInserted() == 0) {
             if ((operation.getFirstError() != null) && operation.getFirstError().startsWith("Duplicate primary key"))
-                return HttpResponse.conflict(FleetCarrierError.ALREADY_EXISTS, fcr.getUUID().toString());
+                return HttpResponse.conflict(FleetCarrierError.ALREADY_EXISTS, fcr.getCarrierId());
             else
                 return HttpResponse.internalServerError("internal server error has occured");
         }
@@ -47,21 +47,21 @@ public class FleetCarrierService {
 
     public HttpResponse<UpdatedOperation> update(FleetCarrierData fcr) {
         TypePair.Builder<FleetCarrier> builder = TypePair.Builder();
-        System.out.println(fcr.getUUID().toString());
-        var                            fco     = database.getCarrierObject(fcr.getUUID().toString());
+        System.out.println(fcr.getCarrierId());
+        var                            fco     = database.getCarrierObject(fcr.getCarrierId());
         if (fco.isPresent()) {
             var carrier = fco.get();
             builder.addType(carrier);
             carrier = Transformer.transform(carrier, fcr);
             var operation = database.update(carrier);
             if (operation.getReplaced() > 0) {
-                builder.addType(database.getCarrierObject(fcr.getUUID().toString()).get());
-                var updatedOperation = new UpdatedOperation(fcr.getUUID().toString(), builder.build().getDiff());
+                builder.addType(database.getCarrierObject(fcr.getCarrierId()).get());
+                var updatedOperation = new UpdatedOperation(fcr.getCarrierId(), builder.build().getDiff());
                 return HttpResponse.ok(updatedOperation);
             }
             return HttpResponse.internalServerError(FleetCarrierError.DATABASE_ERROR);
         }
-        return HttpResponse.notFound(FleetCarrierError.NOT_FOUND, fcr.getUUID().toString());
+        return HttpResponse.notFound(FleetCarrierError.NOT_FOUND, fcr.getCarrierId());
     }
 
     public HttpResponse<Blank> delete(String id) {

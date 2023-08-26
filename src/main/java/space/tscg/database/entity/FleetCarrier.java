@@ -20,40 +20,41 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import elite.dangerous.capi.FleetCarrierData;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.experimental.SuperBuilder;
 import lombok.extern.jackson.Jacksonized;
-import space.tscg.common.database.ManagedObject;
-import space.tscg.common.util.Diffable;
-import space.tscg.common.util.UpdatedValues;
+import space.tscg.api.Diffable;
+import space.tscg.api.carrier.IFleetCarrier;
+import space.tscg.common.UpdatedValues;
+import space.tscg.common.database.DbEntity;
 import space.tscg.operation.Transformer;
 
 @Getter
 @Setter
 @AllArgsConstructor
-@SuperBuilder(builderMethodName = "Builder", toBuilder = true)
+@Builder(builderMethodName = "Builder", toBuilder = true)
 @Jacksonized
-public class FleetCarrier implements ManagedObject, Diffable<FleetCarrier> {
+public class FleetCarrier extends DbEntity implements IFleetCarrier, Diffable<FleetCarrier> {
     
     public static final String TABLE_NAME = "registered";
     
-    private final String id;
+    private final String carrierId;
 
     private String callsign;
 
-    private String vanityName;
+    private String name;
 
-    private String currentStarSystem;
+    private String system;
 
     private int fuel;
 
-    private Services services;
+    private CarrierServices services;
 
     @JsonIgnore
-    FleetCarrier(String id)
+    FleetCarrier(String carrierId)
     {
-        this.id = id;
+        this.carrierId = carrierId;
     }
     
     @JsonIgnore
@@ -69,16 +70,16 @@ public class FleetCarrier implements ManagedObject, Diffable<FleetCarrier> {
     public UpdatedValues diff(FleetCarrier other) {
         return UpdatedValues
             .Builder()
-                .append("vanityName", this.vanityName, other.vanityName)
+                .append("name", this.name, other.name)
                 .append("fuel", this.fuel, other.fuel)
-                .append("currentSolarSystem", this.currentStarSystem, other.currentStarSystem)
+                .append("system", this.system, other.system)
                 .appendDiff("services", this.services.diff(other.services))
                 .buildUpdate();
     }
 
     @Override
     public String getId() {
-        return id;
+        return carrierId;
     }
 
     @Override

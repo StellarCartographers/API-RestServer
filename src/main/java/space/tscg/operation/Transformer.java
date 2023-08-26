@@ -3,19 +3,10 @@ package space.tscg.operation;
 import elite.dangerous.capi.FleetCarrierData;
 import elite.dangerous.capi.meta.Finance.ServiceTaxation;
 import elite.dangerous.capi.meta.ServicesCrew;
+import space.tscg.database.entity.CarrierServices;
+import space.tscg.database.entity.CarrierServices.Service;
+import space.tscg.database.entity.CarrierServices.TaxableService;
 import space.tscg.database.entity.FleetCarrier;
-import space.tscg.database.entity.Services;
-import space.tscg.database.entity.Services.Armoury;
-import space.tscg.database.entity.Services.ConcourseBar;
-import space.tscg.database.entity.Services.Outfitting;
-import space.tscg.database.entity.Services.PioneerSupplies;
-import space.tscg.database.entity.Services.RedemptionOffice;
-import space.tscg.database.entity.Services.Refuel;
-import space.tscg.database.entity.Services.Repair;
-import space.tscg.database.entity.Services.SecureWarehouse;
-import space.tscg.database.entity.Services.Shipyard;
-import space.tscg.database.entity.Services.UniversalCartographics;
-import space.tscg.database.entity.Services.VistaGenomics;
 
 public class Transformer {
     /**
@@ -30,22 +21,22 @@ public class Transformer {
         return fc
             .toBuilder()
                 .callsign(data.getName().getCallsign())
-                .vanityName(data.getName().getVanityName())
-                .currentStarSystem(data.getCurrentStarSystem())
+                .name(data.getName().getVanityName())
+                .system(data.getCurrentStarSystem())
                 .fuel(Integer.valueOf(data.getFuel()))
-                .services(Services
-                    .Creator()
-                        .refuel(Refuel.Creator().active(services.isRefuelEnabled()).taxRate(taxation.refuel).build())
-                        .repair(Repair.Creator().active(services.isRepairEnabled()).taxRate(taxation.repair).build())
-                        .armoury(Armoury.Creator().active(services.isRearmEnabled()).taxRate(taxation.rearm).build())
-                        .redemptionOffice(RedemptionOffice.Creator().active(services.isRedemptionOfficeEnabled()).build())
-                        .shipyard(Shipyard.Creator().active(services.isShipyardEnabled()).taxRate(taxation.shipyard).build())
-                        .outfitting(Outfitting.Creator().active(services.isOutfittingEnabled()).taxRate(taxation.outfitting).build())
-                        .secureWarehouse(SecureWarehouse.Creator().active(services.isBlackmarketEnabled()).build())
-                        .universalCartographics(UniversalCartographics.Creator().active(services.isUniversalCartographicsEnabled()).build())
-                        .concourseBar(ConcourseBar.Creator().active(services.isConcourseEnabled()).build())
-                        .vistaGenomics(VistaGenomics.Creator().active(services.isVistaGenomicsEnabled()).build())
-                        .pioneerSupplies(PioneerSupplies.Creator().active(services.isPioneerSuppliesEnabled()).taxRate(taxation.pioneersupplies).build())
+                .services(CarrierServices.
+                    Builder()
+                        .refuel(TaxableService.Creator().enabled(services.isRefuelEnabled()).tax(taxation.refuel).build())
+                        .repair(TaxableService.Creator().enabled(services.isRepairEnabled()).tax(taxation.repair).build())
+                        .armoury(TaxableService.Creator().enabled(services.isRearmEnabled()).tax(taxation.rearm).build())
+                        .redemptionOffice(Service.Creator().enabled(services.isRedemptionOfficeEnabled()).build())
+                        .shipyard(TaxableService.Creator().enabled(services.isShipyardEnabled()).tax(taxation.shipyard).build())
+                        .outfitting(TaxableService.Creator().enabled(services.isOutfittingEnabled()).tax(taxation.outfitting).build())
+                        .secureWarehouse(Service.Creator().enabled(services.isBlackmarketEnabled()).build())
+                        .universalCartographics(Service.Creator().enabled(services.isUniversalCartographicsEnabled()).build())
+                        .concourseBar(Service.Creator().enabled(services.isConcourseEnabled()).build())
+                        .vistaGenomics(Service.Creator().enabled(services.isVistaGenomicsEnabled()).build())
+                        .pioneerSupplies(TaxableService.Creator().enabled(services.isPioneerSuppliesEnabled()).tax(taxation.pioneersupplies).build())
                         .build())
                 .build();
     }
