@@ -14,32 +14,30 @@
 // * You should have received a copy of the GNU General Public License
 // * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 // */
-package space.tscg.database.entity;
+package space.tscg.database;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.Optional;
 
 import elite.dangerous.capi.FleetCarrierData;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import lombok.extern.jackson.Jacksonized;
 import space.tscg.api.Diffable;
 import space.tscg.api.carrier.IFleetCarrier;
 import space.tscg.common.UpdatedValues;
-import space.tscg.common.database.DbEntity;
-import space.tscg.operation.Transformer;
+import space.tscg.common.db.modal.DbEntity;
+import space.tscg.common.db.op.InsertOperation;
+import space.tscg.common.db.prefab.TSCGDatabase;
+import space.tscg.operation.Builders;
 
-@Getter
-@Setter
-@AllArgsConstructor
+@Data
 @Builder(builderMethodName = "Builder", toBuilder = true)
 @Jacksonized
-public class FleetCarrier extends DbEntity implements IFleetCarrier, Diffable<FleetCarrier> {
+public class FleetCarrier implements DbEntity, IFleetCarrier, Diffable<FleetCarrier> {
     
     public static final String TABLE_NAME = "registered";
     
-    private final String carrierId;
+    private String carrierId;
 
     private String callsign;
 
@@ -51,18 +49,6 @@ public class FleetCarrier extends DbEntity implements IFleetCarrier, Diffable<Fl
 
     private CarrierServices services;
 
-    @JsonIgnore
-    FleetCarrier(String carrierId)
-    {
-        this.carrierId = carrierId;
-    }
-    
-    @JsonIgnore
-    public static FleetCarrier create(FleetCarrierData data)
-    {
-        return Transformer.transform(new FleetCarrier(data.getCarrierId()), data);
-    }
-    
     /**
      * {@inheritDoc}
      */
@@ -76,7 +62,16 @@ public class FleetCarrier extends DbEntity implements IFleetCarrier, Diffable<Fl
                 .appendDiff("services", this.services.diff(other.services))
                 .buildUpdate();
     }
-
+    
+    public static Optional<FleetCarrier> get(String carrierId)
+    {
+        return Optional.ofNullable(TSCGDatabase.instance().get(TABLE_NAME, carrierId, FleetCarrier.class));
+    }
+    
+    public static InsertOperation create(FleetCarrierData fcd) {
+        return TSCGDatabase.instance().create(Builders.fleetCarrier(fcd));
+    }
+    
     @Override
     public String getId() {
         return carrierId;

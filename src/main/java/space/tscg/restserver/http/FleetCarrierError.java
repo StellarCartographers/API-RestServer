@@ -1,29 +1,30 @@
 package space.tscg.restserver.http;
 
+import space.tscg.common.http.HttpState;
+
 public enum FleetCarrierError
 {
-    NONE(""),
-    ALREADY_EXISTS("Fleet Carrier with ID '%s' already exists"),
-    NOT_FOUND("Fleet Carrier with ID '%s' was not found"),
-    EMPTY_RESULT("Nothing contained in Database table"),
-    DATABASE_ERROR("Error occoured with the database");
+    ALREADY_EXISTS("Fleet Carrier with ID '%s' already exists", HttpState.CONFLICT),
+    NOT_FOUND("Fleet Carrier with ID '%s' was not found", HttpState.NOT_FOUND),
+    EMPTY_RESULT("Nothing contained in Database table", HttpState.NO_CONTENT),
+    DATABASE_ERROR("Error occoured with the database", HttpState.INTERNAL_SERVER_ERROR);
 
     private final String message;
+    private final HttpState state;
 
-    FleetCarrierError(){
-        this.message = null;
-    };
-
-    FleetCarrierError(String message)
+    FleetCarrierError(String message, HttpState state)
     {
         this.message = message;
+        this.state = state;
     }
 
-    public String getMessage(Object... arg)
+    public HttpState getState(Object... args)
     {
-        if(message.contains("%s"))
-            return String.format(message, arg);
-        else
-            return message;
+        return state.addData("error", message.formatted(args));
+    }
+    
+    public HttpState getState()
+    {
+        return state.addData("error", message);
     }
 }

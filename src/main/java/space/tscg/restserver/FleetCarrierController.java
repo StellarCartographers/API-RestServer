@@ -1,16 +1,14 @@
 package space.tscg.restserver;
 
-import static io.javalin.apibuilder.ApiBuilder.delete;
-import static io.javalin.apibuilder.ApiBuilder.get;
-import static io.javalin.apibuilder.ApiBuilder.patch;
-import static io.javalin.apibuilder.ApiBuilder.path;
-import static io.javalin.apibuilder.ApiBuilder.post;
+import static io.javalin.apibuilder.ApiBuilder.crud;
 
-import elite.dangerous.capi.FleetCarrierData;
 import io.javalin.Javalin;
+import io.javalin.apibuilder.CrudHandler;
 import io.javalin.http.Context;
+import space.tscg.common.domain.URLEndpoint;
+import space.tscg.common.http.HttpState;
 
-public class FleetCarrierController
+public class FleetCarrierController implements CrudHandler
 {
     public static final String  ENDPOINT = "/carriers";
     private FleetCarrierService service;
@@ -20,72 +18,47 @@ public class FleetCarrierController
         this.service = service;
         javalin.routes(() ->
         {
-            path("carriers", () ->
-            {
-                post(this::createCarrier);
-                patch(this::updateCarrier);
-                get(this::getAllCarriers);
-                path("{carrierId}", () ->
-                {
-                    get(this::getCarrier);
-                    delete(this::deleteCarrier);
-                });
-            });
+            crud(URLEndpoint.API_CARRIERS, this);
         });
     }
 
-    public void createCarrier(Context ctx)
+    @Override
+    public void create(Context ctx)
     {
-        var http = service.create(ctx.bodyAsClass(FleetCarrierData.class));
-        if (http.isError())
-        {
-            ctx.status(http.status()).json(http.customMessage());
-            return;
-        }
-        ctx.status(http.status()).json(http.extras()[0]);
+        service.create(ctx)
+            .peek(id -> ctx.status(HttpState.CREATED.toHttpStatus()).json(id))
+            .onError(err -> ctx.status(err.toHttpStatus()).json(err));
     }
 
-    public void getCarrier(Context ctx)
+    @Override
+    public void delete(Context ctx, String id)
     {
-        var http = service.get(ctx.queryParam("carrierId"));
-        if (http.isError())
-        {
-            ctx.status(http.status()).json(http.customMessage());
-            return;
-        }
-        ctx.status(http.status()).json(http.type());
+        service.delete(id)
+            .peek(del -> ctx.status(HttpState.OK.toHttpStatus()).json(del))
+            .onError(err -> ctx.status(err.toHttpStatus()).json(err));
     }
 
-    public void getAllCarriers(Context ctx)
+    @Override
+    public void getAll(Context ctx)
     {
-        var http = service.getAll();
-        if (http.isError())
-        {
-            ctx.status(http.status()).json(http.customMessage());
-            return;
-        }
-        ctx.status(http.status()).json(http.type());
+        service.getAll()
+            .peek(fcl -> ctx.status(HttpState.OK.toHttpStatus()).json(fcl))
+            .onError(err -> ctx.status(err.toHttpStatus()).json(err));
     }
 
-    public void updateCarrier(Context ctx)
+    @Override
+    public void getOne(Context ctx, String id)
     {
-        var http = service.update(ctx.bodyAsClass(FleetCarrierData.class));
-        if (http.isError())
-        {
-            ctx.status(http.status()).json(http.customMessage());
-            return;
-        }
-        ctx.status(http.status()).json(http.type().getUpdatedValues());
+        service.get(id)
+            .peek(fc -> ctx.status(HttpState.OK.toHttpStatus()).json(fc))
+            .onError(err -> ctx.status(err.toHttpStatus()).json(err));
     }
 
-    public void deleteCarrier(Context ctx)
+    @Override
+    public void update(Context ctx, String id)
     {
-        var http = service.delete(ctx.queryParam("id"));
-        if (http.isError())
-        {
-            ctx.status(http.status()).json(http.customMessage());
-            return;
-        }
-        ctx.status(http.status());
+        service.update(ctx, id)
+            .peek(op -> ctx.status(HttpState.OK.toHttpStatus()).json(op))
+            .onError(err -> ctx.status(err.toHttpStatus()).json(err));
     }
 }

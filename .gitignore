@@ -11,6 +11,7 @@ local.properties
 .loadpath
 .recommenders
 .env
+logs
 
 # External tool builders
 .externalToolBuilders/
@@ -204,3 +205,5 @@ gradle-app.setting
 ### Gradle Patch ###
 # Java heap dump
 *.hprof
+*.public
+*.private
