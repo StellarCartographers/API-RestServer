@@ -17,7 +17,7 @@ public class FleetCarrierController implements CrudHandler
         this.service = service;
         javalin.routes(() ->
         {
-            crud(Route.CARRIER.getRoute(), this);
+            crud(Route.CARRIER.getRoute() + "/{carrierId}", this);
         });
     }
 
