@@ -5,7 +5,6 @@ import java.util.List;
 import elite.dangerous.capi.CAPIFleetCarrier;
 import io.javalin.http.Context;
 import panda.std.Result;
-import space.tscg.ServerLogger;
 import space.tscg.common.TypePair;
 import space.tscg.common.db.prefab.TSCGDatabase;
 import space.tscg.common.http.HttpState;
@@ -17,16 +16,9 @@ import space.tscg.restserver.http.FleetCarrierError;
 
 public class FleetCarrierService
 {
-    ServerLogger         logger;
-    private TSCGDatabase database;
+    private static TSCGDatabase database = TSCGDatabase.instance();
 
-    public FleetCarrierService(ServerLogger logger)
-    {
-        this.logger = logger;
-        this.database = TSCGDatabase.instance();
-    }
-
-    public Result<String, HttpState> create(Context ctx)
+    public static Result<String, HttpState> create(Context ctx)
     {
         CAPIFleetCarrier fcd = ctx.bodyStreamAsClass(CAPIFleetCarrier.class);
         var createOperation = FleetCarrier.create(fcd);
@@ -40,7 +32,7 @@ public class FleetCarrierService
         return Result.ok(fcd.getCarrierId());
     }
 
-    public Result<FleetCarrier, HttpState> get(String id)
+    public static Result<FleetCarrier, HttpState> get(String id)
     {
         var fc = FleetCarrier.get(id);
         if (fc.isEmpty())
@@ -48,7 +40,7 @@ public class FleetCarrierService
         return Result.ok(fc.get());
     }
 
-    public Result<UpdatedOperation, HttpState> update(Context ctx, String id)
+    public static Result<UpdatedOperation, HttpState> update(Context ctx, String id)
     {
         TypePair.Builder<FleetCarrier> builder = TypePair.Builder();
         //
@@ -70,19 +62,19 @@ public class FleetCarrierService
         return Result.error(FleetCarrierError.NOT_FOUND.getState(id));
     }
     
-    private UpdatedOperation completeOperation(TypePair.Builder<FleetCarrier> builder, CAPIFleetCarrier fcd)
+    private static UpdatedOperation completeOperation(TypePair.Builder<FleetCarrier> builder, CAPIFleetCarrier fcd)
     {
         builder.addType(FleetCarrier.get(fcd.getCarrierId()).get());
         return new UpdatedOperation(fcd.getCarrierId(), builder.build().getDiff());
     }
 
-    public Result<String, HttpState> delete(String id)
+    public static Result<String, HttpState> delete(String id)
     {
         var operation = database.delete("carriers", id);
         return Result.when(operation.operationSucceded(), id, FleetCarrierError.NOT_FOUND.getState(id));
     }
 
-    public Result<List<FleetCarrier>, HttpState> getAll()
+    public static Result<List<FleetCarrier>, HttpState> getAll()
     {
         var list = DatabaseUtil.getAllCarriers();
         return Result.when(!list.isEmpty(), list, FleetCarrierError.DATABASE_ERROR.getState());

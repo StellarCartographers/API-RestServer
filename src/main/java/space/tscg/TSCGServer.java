@@ -12,31 +12,26 @@ import space.tscg.common.dotenv.Dotenv;
 import space.tscg.restserver.CAPIAuthController;
 import space.tscg.restserver.CAPIController;
 import space.tscg.restserver.FleetCarrierController;
-import space.tscg.restserver.FleetCarrierService;
 
 
 public class TSCGServer
 {
     private Javalin javalin;
 
-    private ServerLogger serverLogger;
-    
     public static boolean TESTING = Dotenv.getBoolean("testing", false);
     int SERVER_PORT =  Dotenv.getInt("javalin_port" ,9050);
 
     TSCGServer()
     {
         Logger.info("Is Testing: " + TESTING);
-        this.serverLogger = new ServerLogger();
         this.javalin = this.createJavalin();
         this.addEndpoints();
-        this.serverLogger.setupLoggers(this.javalin);
+        this.start();
     }
 
     private void addEndpoints()
     {
-        var fleetCarrierService = new FleetCarrierService(this.serverLogger);
-        new FleetCarrierController(this.javalin, fleetCarrierService);
+        new FleetCarrierController(this.javalin);
         new CAPIAuthController(this.javalin);
         new CAPIController(this.javalin);
     }
@@ -69,6 +64,7 @@ public class TSCGServer
     {
         return Javalin.create(config ->
         {
+            config.showJavalinBanner = false;
             config.jsonMapper(this.gson());
             config.plugins.enableRouteOverview("/overview");
             config.plugins.enableDevLogging();

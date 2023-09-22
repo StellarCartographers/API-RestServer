@@ -38,12 +38,12 @@ public class CAPIAuthService
             return validator.error();
         var    ctx       = validator.getCtx();
         String discordId = ctx.queryParam("discordid");
-        return Result.when(!discordId.matches("\\d{17,19}"), buildAuthorizationLink(discordId), HttpError.badRequest(Data.asLinkedHashMap().add("error", "Invalid Discord ID: " + discordId)).getError());
+        return Result.when(discordId.matches("\\d{17,19}"), buildAuthorizationLink(discordId), HttpError.badRequest(Data.asLinkedHashMap().add("error", "Invalid Discord ID: " + discordId)).getError());
     }
 
     private static String buildAuthorizationLink(String discordId)
     {
-        if (Member.get(discordId).isEmpty())
+        if (!Member.get(discordId).isPresent())
         {
             Member member = Member.Builder().id(discordId).build();
             TSCGDatabase.instance().create(member);

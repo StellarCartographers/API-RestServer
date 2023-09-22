@@ -10,11 +10,8 @@ import space.tscg.common.http.HttpState;
 
 public class FleetCarrierController implements CrudHandler
 {
-    private FleetCarrierService service;
-
-    public FleetCarrierController(Javalin javalin, FleetCarrierService service)
+    public FleetCarrierController(Javalin javalin)
     {
-        this.service = service;
         javalin.routes(() ->
         {
             crud(Route.CARRIER.getRoute() + "/{carrierId}", this);
@@ -24,7 +21,7 @@ public class FleetCarrierController implements CrudHandler
     @Override
     public void create(Context ctx)
     {
-        service.create(ctx)
+        FleetCarrierService.create(ctx)
             .peek(id -> ctx.status(HttpState.CREATED.toHttpStatus()).json(id))
             .onError(err -> ctx.status(err.toHttpStatus()).json(err));
     }
@@ -32,7 +29,7 @@ public class FleetCarrierController implements CrudHandler
     @Override
     public void delete(Context ctx, String id)
     {
-        service.delete(id)
+        FleetCarrierService.delete(id)
             .peek(del -> ctx.status(HttpState.OK.toHttpStatus()).json(del))
             .onError(err -> ctx.status(err.toHttpStatus()).json(err));
     }
@@ -40,7 +37,7 @@ public class FleetCarrierController implements CrudHandler
     @Override
     public void getAll(Context ctx)
     {
-        service.getAll()
+        FleetCarrierService.getAll()
             .peek(fcl -> ctx.status(HttpState.OK.toHttpStatus()).json(fcl))
             .onError(err -> ctx.status(err.toHttpStatus()).json(err));
     }
@@ -48,7 +45,7 @@ public class FleetCarrierController implements CrudHandler
     @Override
     public void getOne(Context ctx, String id)
     {
-        service.get(id)
+        FleetCarrierService.get(id)
             .peek(fc -> ctx.status(HttpState.OK.toHttpStatus()).json(fc))
             .onError(err -> ctx.status(err.toHttpStatus()).json(err));
     }
@@ -56,7 +53,7 @@ public class FleetCarrierController implements CrudHandler
     @Override
     public void update(Context ctx, String id)
     {
-        service.update(ctx, id)
+        FleetCarrierService.update(ctx, id)
             .peek(op -> ctx.status(HttpState.OK.toHttpStatus()).json(op))
             .onError(err -> ctx.status(err.toHttpStatus()).json(err));
     }
