@@ -18,7 +18,7 @@ package space.tscg.database;
 
 import java.util.Optional;
 
-import elite.dangerous.capi.FleetCarrierData;
+import elite.dangerous.capi.CAPIFleetCarrier;
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.jackson.Jacksonized;
@@ -68,7 +68,7 @@ public class FleetCarrier implements DbEntity, IFleetCarrier, Diffable<FleetCarr
         return Optional.ofNullable(TSCGDatabase.instance().get(TABLE_NAME, carrierId, FleetCarrier.class));
     }
     
-    public static InsertOperation create(FleetCarrierData fcd) {
+    public static InsertOperation create(CAPIFleetCarrier fcd) {
         return TSCGDatabase.instance().create(Builders.fleetCarrier(fcd));
     }
     

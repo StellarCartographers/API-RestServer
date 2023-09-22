@@ -1,7 +1,8 @@
 package space.tscg.restserver;
 
 import elite.dangerous.EliteAPI;
-import elite.dangerous.capi.FleetCarrierData;
+import elite.dangerous.capi.CAPIFleetCarrier;
+import elite.dangerous.capi.CAPIProfile;
 import panda.std.Result;
 import space.tscg.common.db.prefab.Member;
 import space.tscg.common.db.prefab.TSCGDatabase;
@@ -16,7 +17,7 @@ import space.tscg.util.Constants;
 
 public class CAPIService
 {
-    public static Result<FleetCarrierData, HttpError> callFleetCarrierEndpoint(QueryValidator validator)
+    public static Result<CAPIFleetCarrier, HttpError> callFleetCarrierEndpoint(QueryValidator validator)
     {
         if(validator.isErr())
             return validator.error();
@@ -34,9 +35,30 @@ public class CAPIService
             return new NotAFleetCarrierOwner().error();
         } else if(call.getCode() != 200)
         {
-            return Result.error(new HttpError(HttpState.fromCode(call.getCode()), null));
+            return Result.error(new HttpError(HttpState.fromCode(call.getCode())));
         }
-        return Result.ok(EliteAPI.fromJson(call.getBody(), FleetCarrierData.class));
+        return Result.ok(EliteAPI.fromJson(call.getBody(), CAPIFleetCarrier.class));
+    }
+    
+    public static Result<CAPIProfile, HttpError> callProileEndoint(QueryValidator validator)
+    {
+        if(validator.isErr())
+            return validator.error();
+            
+        String discordId = validator.getCtx().queryParam("discordid");
+        var m = getMember(discordId);
+        if(m.isErr())
+            return Result.error(m.getError());
+        
+        var auth = TSCGDatabase.instance().get(m.get().getAuthenticationId(), FrontierAuth.TABLE, FrontierAuth.class);
+        String decodedToken = auth.getAccessToken().decodeAsToken().toAuthorizationHeader();
+        var call = Http.GET.header("Authorization", decodedToken).call(Constants.CAPI_PROFILE);
+        
+        if(call.getCode() != 200)
+        {
+            return Result.error(new HttpError(HttpState.fromCode(call.getCode())));
+        }
+        return Result.ok(EliteAPI.fromJson(call.getBody(), CAPIProfile.class));
     }
     
     private static Result<Member, HttpError> getMember(String discordId)

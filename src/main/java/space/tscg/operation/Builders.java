@@ -4,19 +4,19 @@ import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.nimbusds.oauth2.sdk.token.BearerAccessToken;
 import com.nimbusds.oauth2.sdk.token.RefreshToken;
 
-import elite.dangerous.capi.FleetCarrierData;
-import elite.dangerous.capi.meta.Finance.ServiceTaxation;
+import elite.dangerous.capi.CAPIFleetCarrier;
+import elite.dangerous.capi.modal.fleetcarrier.Finance.ServiceTaxation;
+import elite.dangerous.capi.modal.fleetcarrier.ServicesCrew;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import space.tscg.database.CarrierServices;
-import space.tscg.database.FleetCarrier;
-import space.tscg.database.FrontierAuth;
 import space.tscg.database.CarrierServices.Service;
 import space.tscg.database.CarrierServices.TaxableService;
+import space.tscg.database.FleetCarrier;
+import space.tscg.database.FrontierAuth;
 import space.tscg.operation.encryption.EncryptedKey;
-import elite.dangerous.capi.meta.ServicesCrew;
 
 public class Builders {
     /**
@@ -25,7 +25,7 @@ public class Builders {
      * @param carrier the FleetCarrierResult
      * @return a new FleetCarrier instance
      */
-    public static FleetCarrier fleetCarrier(FleetCarrierData data) {
+    public static FleetCarrier fleetCarrier(CAPIFleetCarrier data) {
         ServicesCrew    services = data.getServicesCrew();
         ServiceTaxation taxation = data.getFinance().getServiceTaxation();
         return FleetCarrier.Builder()

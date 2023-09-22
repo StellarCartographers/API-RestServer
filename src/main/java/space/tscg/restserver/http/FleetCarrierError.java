@@ -1,5 +1,6 @@
 package space.tscg.restserver.http;
 
+import space.tscg.common.http.Data;
 import space.tscg.common.http.HttpState;
 
 public enum FleetCarrierError
@@ -20,11 +21,13 @@ public enum FleetCarrierError
 
     public HttpState getState(Object... args)
     {
-        return state.addData("error", message.formatted(args));
+        state.withData(Data.asHashMap().add("error", message.formatted(args)));
+        return state;
     }
     
     public HttpState getState()
     {
-        return state.addData("error", message);
+        state.withData(Data.asHashMap().add("error", message));
+        return state;
     }
 }

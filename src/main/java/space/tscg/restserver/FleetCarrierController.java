@@ -5,12 +5,11 @@ import static io.javalin.apibuilder.ApiBuilder.crud;
 import io.javalin.Javalin;
 import io.javalin.apibuilder.CrudHandler;
 import io.javalin.http.Context;
-import space.tscg.common.domain.URLEndpoint;
+import space.tscg.common.domain.Route;
 import space.tscg.common.http.HttpState;
 
 public class FleetCarrierController implements CrudHandler
 {
-    public static final String  ENDPOINT = "/carriers";
     private FleetCarrierService service;
 
     public FleetCarrierController(Javalin javalin, FleetCarrierService service)
@@ -18,7 +17,7 @@ public class FleetCarrierController implements CrudHandler
         this.service = service;
         javalin.routes(() ->
         {
-            crud(URLEndpoint.API_CARRIERS, this);
+            crud(Route.CARRIER.getRoute(), this);
         });
     }
 

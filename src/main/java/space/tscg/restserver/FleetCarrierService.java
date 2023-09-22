@@ -2,7 +2,7 @@ package space.tscg.restserver;
 
 import java.util.List;
 
-import elite.dangerous.capi.FleetCarrierData;
+import elite.dangerous.capi.CAPIFleetCarrier;
 import io.javalin.http.Context;
 import panda.std.Result;
 import space.tscg.ServerLogger;
@@ -28,7 +28,7 @@ public class FleetCarrierService
 
     public Result<String, HttpState> create(Context ctx)
     {
-        FleetCarrierData fcd = ctx.bodyStreamAsClass(FleetCarrierData.class);
+        CAPIFleetCarrier fcd = ctx.bodyStreamAsClass(CAPIFleetCarrier.class);
         var createOperation = FleetCarrier.create(fcd);
         if (createOperation.getInserted() == 0)
         {
@@ -56,7 +56,7 @@ public class FleetCarrierService
 
         if (fco.isPresent())
         {
-            FleetCarrierData fcd = ctx.bodyStreamAsClass(FleetCarrierData.class);
+            CAPIFleetCarrier fcd = ctx.bodyStreamAsClass(CAPIFleetCarrier.class);
             if(fcd != null)
             {
                 var carrier = fco.get();
@@ -70,7 +70,7 @@ public class FleetCarrierService
         return Result.error(FleetCarrierError.NOT_FOUND.getState(id));
     }
     
-    private UpdatedOperation completeOperation(TypePair.Builder<FleetCarrier> builder, FleetCarrierData fcd)
+    private UpdatedOperation completeOperation(TypePair.Builder<FleetCarrier> builder, CAPIFleetCarrier fcd)
     {
         builder.addType(FleetCarrier.get(fcd.getCarrierId()).get());
         return new UpdatedOperation(fcd.getCarrierId(), builder.build().getDiff());

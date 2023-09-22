@@ -6,7 +6,7 @@ import static io.javalin.apibuilder.ApiBuilder.path;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 import io.javalin.http.HttpStatus;
-import space.tscg.common.domain.URLEndpoint;
+import space.tscg.common.domain.Route;
 import space.tscg.restserver.http.QueryValidator;
 
 public class CAPIController
@@ -15,7 +15,7 @@ public class CAPIController
     {
         javalin.routes(() ->
         {
-            path(URLEndpoint.API_CAPI, () -> {
+            path(Route.CAPI.getRoute(), () -> {
                 get("{discordid}/carrier", this::carrierEndpoint);
                 get("{discordid}/profile", this::profileEndpoint);
             });

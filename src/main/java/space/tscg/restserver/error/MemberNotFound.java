@@ -8,8 +8,8 @@ public class MemberNotFound
 {
     public <T> Result<T, HttpError> error(String memberId)
     {
-        return HttpError.notFound(Data.map()
-            .with("exception", "NotAFleetCarrierOwner")
-            .with("error", "No Member by DiscordID: " + memberId));
+        return HttpError.notFound(Data.asLinkedHashMap()
+            .add("exception", "NotAFleetCarrierOwner")
+            .add("error", "No Member by DiscordID: " + memberId));
     }
 }

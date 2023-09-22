@@ -45,6 +45,6 @@ public final class QueryValidator
     
     public <T> Result<T, HttpError> error()
     {
-        return HttpError.badRequest(Data.map().with("missingQueries", String.join(", ", missing)));
+        return HttpError.badRequest(Data.asLinkedHashMap().add("missingQueries", String.join(", ", missing)));
     }
 }

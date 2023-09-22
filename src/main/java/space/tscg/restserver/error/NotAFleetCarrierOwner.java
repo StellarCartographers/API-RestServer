@@ -8,8 +8,8 @@ public class NotAFleetCarrierOwner
 {
     public <T> Result<T, HttpError> error()
     {
-        return HttpError.notFound(Data.map()
-            .with("exception", "NotAFleetCarrierOwner")
-            .with("error", "Not a FleetCarrier Owner"));
+        return HttpError.notFound(Data.asLinkedHashMap()
+            .add("exception", "NotAFleetCarrierOwner")
+            .add("error", "Not a FleetCarrier Owner"));
     }
 }
