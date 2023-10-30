@@ -4,9 +4,12 @@
  * This work is licensed under the terms of the MIT license.
  * For a copy, see <https://opensource.org/licenses/MIT>.
  */
-package space.tscg.operation.encryption;
+package space.tscg;
 
-public enum KeyType {
-    ACCESS,
-    REFRESH;
+public class ServerLauncher
+{
+    public static void main(String[] args)
+    {
+        new TSCGServer();
+    }
 }

@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2023  The Stellar Cartographers' Guild.
+ *
+ * This work is licensed under the terms of the MIT license.
+ * For a copy, see <https://opensource.org/licenses/MIT>.
+ */
 package space.tscg.operation.encryption;
 
 import java.io.File;
@@ -20,6 +26,7 @@ import javax.crypto.Cipher;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import space.tscg.TSCGServer;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class EncryptDecrypt
@@ -30,6 +37,8 @@ public class EncryptDecrypt
     private static final String PUBLIC_KEY_PATHNAME = "/" + PUBLIC_KEY_FILENAME;
 
     static String encode(String toEncode) {
+        if(TSCGServer.TESTING) { return toEncode; }
+        
         try {
             PublicKey publicKey = loadPublicKey();
 
@@ -41,12 +50,9 @@ public class EncryptDecrypt
         } catch (Exception e) { e.printStackTrace(); return "EncodedFailure"; }
     }
 
-    public static String decode(EncryptedKey<?> key)
-    {
-        return decode(key.getEncryptedKey());
-    }
-    
     public static String decode(String toDecode) {
+        if(TSCGServer.TESTING) { return toDecode; }
+        
         try {
             PrivateKey privateKey = loadPrivateKey();
     
@@ -68,8 +74,7 @@ public class EncryptDecrypt
         }
         KeyFactory publicKeyFactory = KeyFactory.getInstance("RSA");
         EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(publicKeyBytes);
-        PublicKey publicKey = publicKeyFactory.generatePublic(publicKeySpec);
-        return publicKey;
+        return publicKeyFactory.generatePublic(publicKeySpec); 
     }
 
     private static PrivateKey loadPrivateKey() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
@@ -82,7 +87,6 @@ public class EncryptDecrypt
         }
         KeyFactory privateKeyFactory = KeyFactory.getInstance("RSA");
         EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(privateKeyBytes);
-        PrivateKey privateKey = privateKeyFactory.generatePrivate(privateKeySpec);
-        return privateKey;
+        return privateKeyFactory.generatePrivate(privateKeySpec);
     }
 }

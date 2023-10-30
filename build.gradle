@@ -1,79 +1,70 @@
 plugins {
-    id 'eclipse'
-    id 'application'
-    id 'java-library'
-    id 'maven-publish'
-    id 'io.freefair.lombok' version '8.1.0'
-    id 'com.github.johnrengelman.shadow' version '8.1.1'
-    id "com.avast.gradle.docker-compose" version "0.17.4"
+	id "java"
+    id "eclipse"
+    id "application"
+    id "tscg.defaults" version "1.+"
+    id "io.freefair.lombok" version "8.+"
+    id "com.github.johnrengelman.shadow" version "8.+"
 }
 
-repositories {
-    mavenCentral()
-    maven {
-        url 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
-    }
-	maven {
-        url "https://jitpack.io"
-    }
-}
+group = 'space.tscg'
+description = 'TSCG API Server Project'
+mainClassName = 'space.tscg.ServerLauncher'
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
-shadowJar {
-    mergeServiceFiles()
+lombok.version = "1.18.30"
+
+tscg {
+	disableMavenPublish()
+	devName 'ROMVoid95'
+	devEmail 'rom.void95@gmail.com'
 }
 
 dependencies {
-    implementation 'space.tscg.common:stellarlib:0.2.0-SNAPSHOT'
-    implementation 'space.tscg:elitejournal4j:v37-SNAPSHOT'
+    implementation 'space.tscg:stellarlib:1.0.0-SNAPSHOT'
+    implementation 'space.tscg:elite4j:1.0.0-SNAPSHOT'
     implementation 'com.nimbusds:oauth2-oidc-sdk:10.14.2'
     
-	implementation('io.javalin:javalin-bundle:5.6.2') {
-        exclude group: 'ch.qos.logback', module: 'logback-classic'
-    }
-    implementation 'io.javalin.community.routing:routing-annotated:5.6.2-RC.1'
-    implementation 'com.squareup.okhttp3:okhttp:4.10.3'
+	implementation 'space.tscg:javalin:5.6.3-CUSTOM'
+    implementation 'com.squareup.okhttp3:okhttp:4.11.0'
     
     implementation 'com.rethinkdb:rethinkdb-driver:2.4.4'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.3'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.3'
     implementation 'org.panda-lang:expressible:1.3.5'
     
     implementation 'org.tinylog:tinylog-api:2.6.2'
     implementation 'org.tinylog:tinylog-impl:2.6.2'
     implementation 'org.tinylog:slf4j-tinylog:2.6.2'
+    
+    implementation 'org.apache.commons:commons-lang3:3.13.0'
+    implementation 'commons-codec:commons-codec:1.16.0'
 }
 
-group = 'space.tscg'
-version = '1.0-SNAPSHOT'
-
-java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(17)
-	}
-}
-
-publishing {
-    publications {
-        maven(MavenPublication) {
-            from(components.java)
-        }
-    }
-}
-
-tasks.withType(JavaCompile) {
-    options.encoding = 'UTF-8'
-    options.compilerArgs += '-parameters'
-}
-
-tasks.withType(Javadoc) {
+tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
 
 jar {
     manifest {
-        attributes["Main-Class"] = "space.tscg.Launcher"
+        attributes([
+            'Main-Class': 'space.tscg.ServerLauncher',
+            'Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+            'GitCommit': tscg.gitInfo().abbreviatedId,
+            'Git-Branch': tscg.gitInfo().branch
+        ] as LinkedHashMap)    
+        attributes([
+            'Specification-Title':      'StellarAPI',
+            'Specification-Vendor':     'TSCG',
+            'Specification-Version':    '1',
+            'Implementation-Title':     'StellarAPI Server',
+            'Implementation-Version':   project.version,
+            'Implementation-Vendor':    'StellarCartographers'
+        ] as LinkedHashMap, 'space/tscg/')
     }
 }
 
-application {
-    mainClass = "space.tscg.Launcher"
+shadowJar {
+    mergeServiceFiles()
+    minimize()
 }

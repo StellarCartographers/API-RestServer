@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2023  The Stellar Cartographers' Guild.
+ *
+ * This work is licensed under the terms of the MIT license.
+ * For a copy, see <https://opensource.org/licenses/MIT>.
+ */
 package space.tscg.util;
 
 import java.net.URI;
@@ -7,7 +13,7 @@ import com.nimbusds.oauth2.sdk.id.ClientID;
 
 import lombok.experimental.UtilityClass;
 import okhttp3.HttpUrl;
-import space.tscg.common.dotenv.Dotenv;
+import space.tscg.properties.dot.Dotenv;
 
 @UtilityClass
 public final class Constants
@@ -16,8 +22,6 @@ public final class Constants
     
     public final static ClientID CLIENT_ID = new ClientID(Constants.CLIENT_ID_VARIABLE);
     
-    public final static String CALLBACK_URL = "https://api.tscg.network/oauth/callback";
-
     public final static String LIVE_SERVER   = "https://companion.orerve.net";
     public final static String LEGACY_SERVER = "https://legacy-companion.orerve.net/";
     public final static String AUTH_SERVER   = "https://auth.frontierstore.net";

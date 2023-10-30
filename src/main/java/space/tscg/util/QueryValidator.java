@@ -1,4 +1,10 @@
-package space.tscg.restserver.http;
+/**
+ * Copyright (c) 2023  The Stellar Cartographers' Guild.
+ *
+ * This work is licensed under the terms of the MIT license.
+ * For a copy, see <https://opensource.org/licenses/MIT>.
+ */
+package space.tscg.util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -7,8 +13,8 @@ import java.util.List;
 import io.javalin.http.Context;
 import lombok.Getter;
 import panda.std.Result;
-import space.tscg.common.http.Data;
-import space.tscg.common.http.HttpError;
+import space.tscg.collections.Data;
+import space.tscg.web.HttpError;
 
 public final class QueryValidator
 {
@@ -28,7 +34,7 @@ public final class QueryValidator
         required.addAll(Arrays.asList(queries));
     }
     
-    public Result<Context, HttpError> run()
+    public Result<Context, HttpError> Validate()
     {
         required.forEach(r -> {
             if(!ctx.queryParamMap().containsKey(r)) {
@@ -40,7 +46,7 @@ public final class QueryValidator
     
     public boolean isErr()
     {
-        return this.run().isErr();
+        return this.Validate().isErr();
     }
     
     public <T> Result<T, HttpError> error()

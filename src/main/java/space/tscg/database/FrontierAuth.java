@@ -1,63 +1,63 @@
+/**
+ * Copyright (c) 2023  The Stellar Cartographers' Guild.
+ *
+ * This work is licensed under the terms of the MIT license.
+ * For a copy, see <https://opensource.org/licenses/MIT>.
+ */
 package space.tscg.database;
 
-import java.time.Instant;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.nimbusds.oauth2.sdk.token.BearerAccessToken;
-import com.nimbusds.oauth2.sdk.token.RefreshToken;
 
 import lombok.Data;
-import space.tscg.common.db.modal.DbEntity;
-import space.tscg.common.db.prefab.Member;
-import space.tscg.common.db.prefab.TSCGDatabase;
+import space.tscg.api.database.DbEntity;
+import space.tscg.database.defined.TSCGDatabase;
+import space.tscg.database.entity.TSCGMember;
 import space.tscg.operation.Builders;
 import space.tscg.operation.encryption.EncryptedKey;
+import space.tscg.operation.encryption.KeyType;
 
 @Data
 @JsonDeserialize(builder = Builders.FrontierAuthentication.class)
 public class FrontierAuth implements DbEntity {
     
-    public static String TABLE = "auth";
-    
     private final UUID id;
-    private EncryptedKey<BearerAccessToken> accessToken;
-    private EncryptedKey<RefreshToken> refreshToken;
-    private long expireEpochSecond;
+    private String accessToken;
+    private String refreshToken;
+    private long expiresAt;
     
     public FrontierAuth(Builders.FrontierAuthentication builder) {
         this.id = UUID.randomUUID();
         this.accessToken = builder.getAccessToken();
         this.refreshToken = builder.getRefreshToken();
-        this.expireEpochSecond = setExpireEpoch(builder.getExpiresIn());
+        this.expiresAt = builder.getExpiresAt();
     }
     
     @JsonIgnore
-    public boolean updateKeys(BearerAccessToken accessToken, RefreshToken refreshToken, long expiresIn)
+    public boolean updateKeys(String accessToken, String refreshToken, long expiresAt)
     {
-        this.accessToken = EncryptedKey.of(accessToken);
-        this.refreshToken = EncryptedKey.of(refreshToken);
-        this.expireEpochSecond = setExpireEpoch(expiresIn);
+        this.accessToken = EncryptedKey.of(accessToken, KeyType.ACCESS).getKey();
+        this.refreshToken = EncryptedKey.of(refreshToken, KeyType.REFRESH).getKey();
+        this.expiresAt = expiresAt;
         return TSCGDatabase.instance().update(this).operationSucceded();
-    }
-    
-    @JsonIgnore
-    private long setExpireEpoch(long seconds)
-    {
-        return Instant.now().plusSeconds(seconds).getEpochSecond();
     }
 
     @JsonIgnore
-    public boolean isAccessTokenExpired()
+    public static FrontierAuth getForMember(TSCGMember member)
     {
-        return Instant.now().isAfter(Instant.ofEpochSecond(expireEpochSecond));
+        return TSCGDatabase.instance().get(DefinedTable.AUTH.toString(), member.getAuthenticationId(), FrontierAuth.class);
     }
     
-    @JsonIgnore
-    public FrontierAuth getForMember(Member member)
+    public String getRefreshToken()
     {
-        return TSCGDatabase.instance().get(getTableName(), member.getAuthenticationId(), FrontierAuth.class);
+        return EncryptedKey.of(refreshToken, KeyType.REFRESH).getKey();
+    }
+    
+    public String getAccessToken()
+    {
+        return EncryptedKey.of(accessToken, KeyType.ACCESS).getKey();
     }
     
     @Override
@@ -67,8 +67,8 @@ public class FrontierAuth implements DbEntity {
     }
 
     @Override
-    public String getTableName()
+    public DefinedTable getTable()
     {
-        return TABLE;
+        return DefinedTable.AUTH;
     }
 }

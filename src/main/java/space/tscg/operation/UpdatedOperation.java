@@ -1,13 +1,12 @@
+/**
+ * Copyright (c) 2023  The Stellar Cartographers' Guild.
+ *
+ * This work is licensed under the terms of the MIT license.
+ * For a copy, see <https://opensource.org/licenses/MIT>.
+ */
 package space.tscg.operation;
 
-import lombok.AllArgsConstructor;
-import lombok.Value;
-import space.tscg.common.UpdatedValues;
+import space.tscg.collections.DiffMap;
 
-@AllArgsConstructor
-@Value
-public class UpdatedOperation
-{
-    private String uuid;
-    private UpdatedValues updatedValues;
+public record UpdatedOperation(String uuid, DiffMap map) {
 }

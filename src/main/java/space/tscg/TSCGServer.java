@@ -1,73 +1,63 @@
+/**
+ * Copyright (c) 2023  The Stellar Cartographers' Guild.
+ *
+ * This work is licensed under the terms of the MIT license.
+ * For a copy, see <https://opensource.org/licenses/MIT>.
+ */
 package space.tscg;
 
-import java.lang.reflect.Type;
-
-import org.jetbrains.annotations.NotNull;
 import org.tinylog.Logger;
 
-import elite.dangerous.EliteAPI;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
 import io.javalin.Javalin;
-import io.javalin.json.JsonMapper;
-import space.tscg.common.dotenv.Dotenv;
-import space.tscg.restserver.CAPIAuthController;
-import space.tscg.restserver.CAPIController;
-import space.tscg.restserver.FleetCarrierController;
+import io.javalin.json.JavalinJackson;
+import io.javalin.plugin.bundled.DevLoggingPlugin;
+import io.javalin.util.JavalinLogger;
+import space.tscg.database.Metrics;
+import space.tscg.internal.local.LocalTesting;
+import space.tscg.properties.dot.Dotenv;
+import space.tscg.rest.ServerEndpoints;
 
 
 public class TSCGServer
 {
-    private Javalin javalin;
+    private final Javalin javalin;
 
-    public static boolean TESTING = Dotenv.getBoolean("testing", false);
+    public static boolean TESTING;
     int SERVER_PORT =  Dotenv.getInt("javalin_port" ,9050);
 
     TSCGServer()
     {
-        Logger.info("Is Testing: " + TESTING);
+        if(Dotenv.get("db_host").equals("localhost"))
+        {
+            Logger.tag("LocalTesting").info("Detected Local Testing Parameters");
+            Logger.tag("LocalTesting").info("Setting up Database DefinedTable if needed");
+            LocalTesting.setupDefinedTableIfNeeded();
+            TESTING = true;
+            Logger.tag("LocalTesting").info("TESTING: " + TESTING);
+        }
+        Metrics.createIfNeeded();
         this.javalin = this.createJavalin();
-        this.addEndpoints();
+        new ServerEndpoints(javalin);
         this.start();
-    }
-
-    private void addEndpoints()
-    {
-        new FleetCarrierController(this.javalin);
-        new CAPIAuthController(this.javalin);
-        new CAPIController(this.javalin);
     }
 
     void start()
     {
-        Logger.info("Server Port: " + SERVER_PORT);
+        Logger.tag("TSCGServer").info("Server Port: " + SERVER_PORT);
         this.javalin.start(SERVER_PORT);
-    }
-
-    private JsonMapper gson()
-    {
-        return new JsonMapper()
-        {
-            @Override
-            public String toJsonString(@NotNull Object obj, @NotNull Type type)
-            {
-                return EliteAPI.toJson(obj, type);
-            }
-
-            @Override
-            public <T> T fromJsonString(@NotNull String json, @NotNull Type targetType)
-            {
-                return EliteAPI.fromJson(json, targetType);
-            }
-        };
     }
 
     private Javalin createJavalin()
     {
+        JavalinLogger.useTinyLogger("Javalin");
         return Javalin.create(config ->
         {
             config.showJavalinBanner = false;
-            config.jsonMapper(this.gson());
+            config.jsonMapper(new JavalinJackson().updateMapper(mapper -> mapper.registerModule(new JavaTimeModule())));
             config.plugins.enableRouteOverview("/overview");
-            config.plugins.enableDevLogging();
+            config.plugins.register(new DevLoggingPlugin());
         });
     }
 }

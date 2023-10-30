@@ -207,3 +207,4 @@ gradle-app.setting
 *.hprof
 *.public
 *.private
+env.local

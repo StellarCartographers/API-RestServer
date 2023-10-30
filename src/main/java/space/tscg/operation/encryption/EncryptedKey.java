@@ -3,49 +3,51 @@ package space.tscg.operation.encryption;
 import java.beans.ConstructorProperties;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.nimbusds.oauth2.sdk.token.BearerAccessToken;
 import com.nimbusds.oauth2.sdk.token.RefreshToken;
-import com.nimbusds.oauth2.sdk.token.Token;
 
-import lombok.Getter;
+import space.tscg.TSCGServer;
 
-@Getter
-public final class EncryptedKey<T extends Token>
+public final class EncryptedKey
 {
-    private final String encryptedKey;
-    private final KeyType keyType;
+    private final String key;
+    private final KeyType type;
     
     @JsonCreator
     @ConstructorProperties({"key", "type"})
     private EncryptedKey(@JsonProperty("key") String key, @JsonProperty("type") KeyType type)
     {
-        this.encryptedKey = EncryptDecrypt.encode(key);
-        this.keyType = type;
+        this.key = TSCGServer.TESTING ? key : EncryptDecrypt.encode(key);
+        this.type = type;
     }
     
-    public static <T extends Token> EncryptedKey<T> of(T token)
+    public static EncryptedKey of(String key, KeyType type)
     {
-        if(token instanceof BearerAccessToken)
-        {
-            return new EncryptedKey<>(token.getValue(), KeyType.ACCESS);
-        } else if (token instanceof RefreshToken) {
-            return new EncryptedKey<>(token.getValue(), KeyType.REFRESH);
-        } else {
-            throw new IllegalArgumentException("(T token) must be instanceof 'AccessToken' or 'RefreshToken'");
-        }
+        return new EncryptedKey(key, type);
+    }
+
+    public String getKey()
+    {
+        return TSCGServer.TESTING ? key : EncryptDecrypt.decode(key);
     }
     
-    @JsonIgnore
-    public T decodeAsToken()
+    public KeyType getType()
     {
-        return keyType.asToken(EncryptDecrypt.decode(encryptedKey));
+        return type;
     }
     
-    @JsonIgnore
-    public String getDecodedString()
+    public BearerAccessToken asBearerAccessToken()
     {
-        return EncryptDecrypt.decode(encryptedKey);
+        if(getType().equals(KeyType.ACCESS))
+            return new BearerAccessToken(key);
+        throw new RuntimeException();
+    }
+    
+    public RefreshToken asRefreshToken()
+    {
+        if(getType().equals(KeyType.REFRESH))
+            return new RefreshToken(key);
+        throw new RuntimeException();
     }
 }
